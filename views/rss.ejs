@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>AEK365 RSS Feed</title>
+  <link>https://www.aek365.org/</link>
+  <description>Latest articles from AEK365</description>
+  <% articles.forEach(function(article) { %>
+    <item>
+      <title><%= article.title %></title>
+      <link><%= article.url %></link>
+    </item>
+  <% }); %>
+</channel>
+</rss>

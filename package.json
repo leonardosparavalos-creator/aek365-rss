@@ -1,0 +1,14 @@
+{
+  "name": "aek365-rss",
+  "version": "1.0.0",
+  "description": "Puppeteer-based RSS feed for AEK365",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "puppeteer": "^21.3.8"
+  }
+}
