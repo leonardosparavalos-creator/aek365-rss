@@ -7,10 +7,9 @@ const PORT = process.env.PORT || 3000;
 app.get("/feeds/aek365.xml", async (req, res) => {
   try {
     const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: puppeteer.executablePath(), // ✅ BUILT-IN Chrome path
-    });
+  headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+});
 
     const page = await browser.newPage();
     await page.goto("https://www.aek365.org/articles_categories-121/podosfairo.htm", {

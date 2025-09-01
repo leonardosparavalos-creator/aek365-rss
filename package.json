@@ -8,8 +8,12 @@
   },
   "dependencies": {
     "ejs": "^3.1.9",
+<<<<<<< HEAD
     "express": "^4.21.2",
     "puppeteer": "^19.11.1",
+=======
+    "puppeteer": "19.11.1",
+>>>>>>> c5f6935825e722f3ac7758f4a089687745d0cc78
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
