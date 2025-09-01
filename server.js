@@ -1,34 +1,37 @@
 const express = require("express");
-const { chromium } = require("playwright");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+
+puppeteer.use(StealthPlugin());
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get("/feeds/aek365.xml", async (req, res) => {
-  const browser = await chromium.launch({
+  const browser = await puppeteer.launch({
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
   try {
-    const context = await browser.newContext({
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-      viewport: { width: 1280, height: 800 }
-    });
+    const page = await browser.newPage();
 
-    const page = await context.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115 Safari/537.36"
+    );
 
-    await page.goto("https://www.aek365.org/articles_categories-121/podosfairo.htm", {
-      waitUntil: "networkidle",
-      timeout: 60000,
-    });
+    await page.goto(
+      "https://www.aek365.org/articles_categories-121/podosfairo.htm",
+      {
+        waitUntil: "networkidle0",
+        timeout: 60000,
+      }
+    );
 
-    // Wait additional time for JS content
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(5000); // wait for content to render
 
-    // Scrape article links
-    const articles = await page.$$eval("article.article h2.h2 a", nodes =>
-      nodes.map(n => ({
+    const articles = await page.$$eval("article.article h2.h2 a", (nodes) =>
+      nodes.map((n) => ({
         title: n.innerText.trim(),
         link: "https://www.aek365.org" + n.getAttribute("href"),
       }))
@@ -37,7 +40,7 @@ app.get("/feeds/aek365.xml", async (req, res) => {
     await browser.close();
 
     if (!articles.length) {
-      throw new Error("No articles found. Check selector or page rendering.");
+      throw new Error("No articles found.");
     }
 
     // Build RSS XML
@@ -46,16 +49,16 @@ app.get("/feeds/aek365.xml", async (req, res) => {
         <channel>
           <title>AEK365 – Ποδόσφαιρο</title>
           <link>https://www.aek365.org/articles_categories-121/podosfairo.htm</link>
-          <description>Auto-generated feed for MonitoRSS</description>
+          <description>Auto-generated feed</description>
           ${articles
             .map(
-              a => `
-              <item>
-                <title><![CDATA[${a.title}]]></title>
-                <link>${a.link}</link>
-                <guid>${a.link}</guid>
-                <pubDate>${new Date().toUTCString()}</pubDate>
-              </item>`
+              (a) => `
+            <item>
+              <title><![CDATA[${a.title}]]></title>
+              <link>${a.link}</link>
+              <guid>${a.link}</guid>
+              <pubDate>${new Date().toUTCString()}</pubDate>
+            </item>`
             )
             .join("")}
         </channel>
@@ -65,16 +68,16 @@ app.get("/feeds/aek365.xml", async (req, res) => {
     res.set("Content-Type", "application/rss+xml");
     res.send(rssFeed);
   } catch (err) {
-    console.error("Error generating feed:", err);
+    console.error("Feed error:", err.message);
     res.status(503).send("Failed to fetch RSS feed.");
     await browser.close();
   }
 });
 
 app.get("/", (req, res) => {
-  res.send("AEK365 RSS Generator is running. Visit /feeds/aek365.xml to view the feed.");
+  res.send("✅ AEK365 RSS is live. Visit /feeds/aek365.xml to get your feed.");
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
