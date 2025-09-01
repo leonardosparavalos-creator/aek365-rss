@@ -1,32 +1,33 @@
 const express = require("express");
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const puppeteer = require("puppeteer-core");
+const { executablePath } = require("puppeteer");
 
-puppeteer.use(StealthPlugin());
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.get("/feeds/aek365.xml", async (req, res) => {
   try {
-   const browser = await puppeteer.launch({
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox"],
-});
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: executablePath(), // ✅ THIS tells it to use built-in Chrome
+    });
+
     const page = await browser.newPage();
     await page.goto("https://www.aek365.org/articles_categories-121/podosfairo.htm", {
       waitUntil: "domcontentloaded",
       timeout: 60000,
     });
 
-    const articles = await page.$$eval(".articlelist_item", nodes =>
-      nodes.map(n => {
-        const title = n.querySelector("a")?.innerText || "No title";
-        const link = n.querySelector("a")?.href || "";
-        return { title, link };
-      })
+    const articles = await page.$$eval(".article-list .article", nodes =>
+      nodes.map(n => ({
+        title: n.querySelector("a")?.innerText || "No title",
+        link: n.querySelector("a")?.href || "",
+      }))
     );
 
     await browser.close();
-    console.log("✅ Articles fetched:", articles);
+
     if (!articles.length) throw new Error("No articles found — check selector");
 
     res.set("Content-Type", "application/rss+xml");
@@ -36,26 +37,24 @@ app.get("/feeds/aek365.xml", async (req, res) => {
           <title>AEK365 – Ποδόσφαιρο</title>
           <link>https://www.aek365.org/articles_categories-121/podosfairo.htm</link>
           <description>Auto-generated feed</description>
-          ${articles.map(a => `
+          ${articles
+            .map(
+              a => `
             <item>
               <title><![CDATA[${a.title}]]></title>
               <link>${a.link}</link>
               <guid>${a.link}</guid>
               <pubDate>${new Date().toUTCString()}</pubDate>
-            </item>
-          `).join("")}
+            </item>`
+            )
+            .join("")}
         </channel>
       </rss>
     `);
   } catch (err) {
-  console.error("❌ RSS error:", err); // 👈 more visible in logs
-  res.status(503).send(`Failed to fetch RSS feed.\n\nError: ${err.message}`);
-}
+    console.error("RSS error:", err);
+    res.status(503).send("Failed to fetch RSS feed. Error: " + err.message);
+  }
 });
 
-// ✅ THIS MUST BE LAST
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
