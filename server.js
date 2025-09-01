@@ -17,12 +17,15 @@ app.get("/feeds/aek365.xml", async (req, res) => {
       timeout: 60000,
     });
 
-    const articles = await page.$$eval("article.article h2.h2 a", nodes =>
-      nodes.map(n => ({
-        title: n.innerText.trim(),
-        link: `https://www.aek365.org${n.getAttribute("href")}`,
-      }))
-    );
+   await page.waitForSelector("article.article h2.h2 a", { timeout: 15000 });
+
+const articles = await page.$$eval("article.article h2.h2 a", nodes =>
+  nodes.map(n => ({
+    title: n.innerText.trim(),
+    link: "https://www.aek365.org" + n.getAttribute("href"),
+  }))
+);
+
 
     await browser.close();
 
