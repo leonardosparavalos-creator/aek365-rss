@@ -1,6 +1,5 @@
 const express = require("express");
-const puppeteer = require("puppeteer-core");
-const { executablePath } = require("puppeteer");
+const puppeteer = require("puppeteer"); // ✅ NOT puppeteer-core
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +9,7 @@ app.get("/feeds/aek365.xml", async (req, res) => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: executablePath(), // ✅ THIS tells it to use built-in Chrome
+      executablePath: puppeteer.executablePath(), // ✅ BUILT-IN Chrome path
     });
 
     const page = await browser.newPage();
