@@ -7,11 +7,10 @@ const app = express();
 
 app.get("/feeds/aek365.xml", async (req, res) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-
+   const browser = await puppeteer.launch({
+  headless: true,
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+});
     const page = await browser.newPage();
     await page.goto("https://www.aek365.org/articles_categories-121/podosfairo.htm", {
       waitUntil: "domcontentloaded",
