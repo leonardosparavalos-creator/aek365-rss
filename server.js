@@ -7,6 +7,10 @@ puppeteer.use(StealthPlugin());
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
+
 app.get("/feeds/aek365.xml", async (req, res) => {
   const browser = await puppeteer.launch({
     headless: true,
