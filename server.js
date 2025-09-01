@@ -27,7 +27,7 @@ app.get("/feeds/aek365.xml", async (req, res) => {
     );
 
     await browser.close();
-
+    console.log("✅ Articles fetched:", articles);
     if (!articles.length) throw new Error("No articles found — check selector");
 
     res.set("Content-Type", "application/rss+xml");
@@ -49,9 +49,9 @@ app.get("/feeds/aek365.xml", async (req, res) => {
       </rss>
     `);
   } catch (err) {
-    console.error("RSS error:", err);
-    res.status(503).send("Failed to fetch RSS feed.");
-  }
+  console.error("❌ RSS error:", err); // 👈 more visible in logs
+  res.status(503).send(`Failed to fetch RSS feed.\n\nError: ${err.message}`);
+}
 });
 
 // ✅ THIS MUST BE LAST
