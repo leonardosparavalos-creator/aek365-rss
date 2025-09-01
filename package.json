@@ -9,8 +9,8 @@
   "dependencies": {
     "ejs": "^3.1.9",
     "express": "^4.21.2",
-    "playwright": "^1.47.2",
     "puppeteer": "^24.17.1",
+    "puppeteer-core": "^24.17.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
