@@ -5,11 +5,6 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
 
 app.get("/feeds/aek365.xml", async (req, res) => {
   const browser = await puppeteer.launch({
@@ -85,3 +80,10 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
+
