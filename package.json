@@ -4,7 +4,7 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-  "postinstall": "npx puppeteer browsers install chrome",
+  "postinstall": "echo 'Skipping manual Chrome install for Render'",
   "start": "node server.js"
 },
   "dependencies": {
